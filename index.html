@@ -3,542 +3,221 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pizzeria POS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pizzeria Kiosk</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#be1e2d',
+                        'primary-dark': '#9e1926',
+                        sidebar: '#2d3748',
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        :root {
-            --primary: #6366f1;
-            --primary-hover: #4f46e5;
-            --bg-dark: #0f172a;
-            --bg-card: #1e293b;
-            --bg-modal: #1e293bf2;
-            --text-main: #f1f5f9;
-            --text-muted: #94a3b8;
-            --border: #334155;
-            --success: #22c55e;
-            --danger: #ef4444;
+        /* CustomScrollbar */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            height: 100vh;
-            display: flex;
-            overflow: hidden;
-        }
-
-        /* Layout */
-        .app-container {
-            display: flex;
-            width: 100%;
-            height: 100%;
-        }
-
-        /* Menu Section (Left) */
-        .menu-section {
-            flex: 1;
-            padding: 2rem;
-            overflow-y: auto;
-            border-right: 1px solid var(--border);
-        }
-
-        .header {
-            margin-bottom: 2rem;
-        }
-
-        .header h1 {
-            font-size: 2rem;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-        }
-
-        .header p {
-            color: var(--text-muted);
-        }
-
-        .category-title {
-            font-size: 1.25rem;
-            margin: 2rem 0 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid var(--border);
-            color: var(--text-main);
-        }
-
-        .menu-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 1.5rem;
-            padding-bottom: 2rem;
-        }
-
-        .menu-item {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 1rem;
-            padding: 1.5rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .menu-item:hover {
-            transform: translateY(-4px);
-            border-color: var(--primary);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
-        }
-
-        .menu-item:active {
-            transform: scale(0.98);
-        }
-
-        .item-emoji {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            display: block;
-            text-align: center;
-        }
-
-        .item-details h3 {
-            font-size: 1.1rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .item-details p {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
-        }
-
-        .item-price {
-            font-weight: 700;
-            color: var(--primary);
-            font-size: 1.1rem;
-        }
-
-        /* Cart Section (Right) */
-        .cart-section {
-            width: 400px;
-            background: var(--bg-card);
-            display: flex;
-            flex-direction: column;
-            box-shadow: -4px 0 15px rgba(0, 0, 0, 0.3);
-            z-index: 10;
-        }
-
-        .cart-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .cart-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-        }
-
-        .cart-count {
-            background: var(--primary);
-            padding: 0.2rem 0.6rem;
-            border-radius: 1rem;
-            font-size: 0.85rem;
-            font-weight: bold;
-        }
-
-        .cart-items {
-            flex: 1;
-            overflow-y: auto;
-            padding: 1rem;
-        }
-
-        .empty-cart {
-            text-align: center;
-            color: var(--text-muted);
-            margin-top: 4rem;
-        }
-
-        .empty-cart-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            opacity: 0.5;
-        }
-
-        .cart-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            padding: 1rem;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 0.75rem;
-            margin-bottom: 1rem;
-            animation: slideIn 0.3s ease;
-        }
-
-        .cart-item-details {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-top: 0.25rem;
-            line-height: 1.4;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .cart-item-info {
-            flex: 1;
-        }
-
-        .cart-item-title {
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-
-        .cart-item-price {
-            color: var(--primary);
-            font-weight: 600;
-            font-size: 0.9rem;
-            margin-top: 0.25rem;
-        }
-
-        .cart-item-controls {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-left: 1rem;
-        }
-
-        .qty-btn {
-            background: var(--bg-dark);
-            border: 1px solid var(--border);
-            color: var(--text-main);
-            width: 28px;
-            height: 28px;
-            border-radius: 6px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
-
-        .qty-btn:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        .remove-btn {
-            color: var(--danger);
-            border-color: rgba(239, 68, 68, 0.3);
-        }
-
-        .remove-btn:hover {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--danger);
-            border-color: var(--danger);
-        }
-
-        .cart-footer {
-            padding: 1.5rem;
-            border-top: 1px solid var(--border);
-            background: rgba(0, 0, 0, 0.2);
-        }
-
-        .total-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 1.5rem;
-            font-size: 1.25rem;
-            font-weight: 700;
-        }
-
-        .checkout-btn {
-            width: 100%;
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 1rem;
-            border-radius: 0.75rem;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .checkout-btn:hover {
-            background: var(--primary-hover);
-        }
-
-        .checkout-btn:disabled {
-            background: var(--border);
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-
-        /* Modal Styles */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(4px);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .modal {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 1rem;
-            width: 90%;
-            max-width: 600px;
-            max-height: 90vh;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
-            transform: translateY(20px);
-            transition: transform 0.3s ease;
-        }
-
-        .modal-overlay.active .modal {
-            transform: translateY(0);
-        }
-
-        .modal-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-
-        .modal-close {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-
-        .modal-body {
-            padding: 1.5rem;
-            overflow-y: auto;
-        }
-
-        .option-group {
-            margin-bottom: 2rem;
-        }
-
-        .option-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .radio-grid,
-        .checkbox-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 1rem;
-        }
-
-        .option-card {
-            background: var(--bg-dark);
-            border: 1px solid var(--border);
-            border-radius: 0.5rem;
-            padding: 1rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            position: relative;
-        }
-
-        .option-card:hover {
-            border-color: var(--primary);
-        }
-
-        .option-card.selected {
-            border-color: var(--primary);
-            background: rgba(99, 102, 241, 0.1);
-        }
-
-        .option-card input {
-            position: absolute;
-            opacity: 0;
-        }
-
-        .option-name {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-
-        .option-price {
-            display: block;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-
-        .modal-footer {
-            padding: 1.5rem;
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-price {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        .add-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 0.75rem 2rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .add-btn:hover {
-            background: var(--primary-hover);
-        }
-
-        /* Responsive */
-        @media (max-width: 900px) {
-            .app-container {
-                flex-direction: column;
-                overflow: auto;
-            }
-
-            body {
-                overflow: auto;
-                height: auto;
-            }
-
-            .cart-section {
-                width: 100%;
-                height: auto;
-                border-left: none;
-                border-top: 1px solid var(--border);
-            }
-
-            .cart-items {
-                max-height: 400px;
-            }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
     </style>
 </head>
 
-<body>
+<body class="bg-gray-50 text-gray-900 h-screen w-screen overflow-hidden font-sans select-none flex flex-col">
 
-    <div class="app-container">
-        <!-- Menu Section -->
-        <main class="menu-section">
-            <div class="header">
-                <h1>🍕 SliceOS</h1>
-                <p>Select items to add to order</p>
+    <!-- Mobile Header -->
+    <header class="md:hidden bg-sidebar text-white p-4 flex justify-between items-center shadow-md z-20 shrink-0">
+        <h1 class="text-xl font-bold tracking-tight">Pos<span class="text-red-400">Pizza</span></h1>
+        <div class="text-xs text-gray-400">Kiosk Mode</div>
+    </header>
+
+    <!-- Mobile Tab Nav (Horizontal Scroll) -->
+    <nav class="md:hidden bg-sidebar text-gray-300 shadow-lg z-10 shrink-0 overflow-x-auto whitespace-nowrap no-scrollbar flex border-t border-gray-700"
+        id="mobile-nav">
+        <!-- Injected via JS -->
+    </nav>
+
+    <!-- Main Content Area (Layout Container) -->
+    <div class="flex flex-1 overflow-hidden relative">
+
+        <!-- Desktop Sidebar Nav -->
+        <nav class="hidden md:flex flex-col w-64 bg-sidebar text-white shadow-xl z-20">
+            <div class="p-6 border-b border-gray-700">
+                <h1 class="text-2xl font-bold tracking-tight">Pos<span class="text-red-400">Pizza</span></h1>
             </div>
+            <div class="flex-1 overflow-y-auto py-2" id="desktop-nav">
+                <!-- Injected via JS -->
+            </div>
+        </nav>
 
-            <div id="menu-container">
-                <!-- Categories and items will be injected here -->
+        <!-- Main Product Grid -->
+        <main class="flex-1 flex flex-col bg-gray-100 overflow-hidden relative">
+            <!-- Fade Overlay at bottom for scroll hint -->
+
+            <div class="flex-1 overflow-y-auto p-4 md:p-8" id="main-scroll-area">
+                <header class="mb-6 flex justify-between items-end">
+                    <h2 class="text-2xl md:text-3xl font-bold text-gray-800" id="category-title">Menu</h2>
+                </header>
+
+                <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 pb-24 md:pb-0" id="menu-grid">
+                    <!-- Injected via JS -->
+                </div>
             </div>
         </main>
 
-        <!-- Cart Section -->
-        <aside class="cart-section">
-            <div class="cart-header">
-                <span class="cart-title">Current Order</span>
-                <span class="cart-count" id="cart-count">0 items</span>
+        <!-- Desktop Cart Sidebar -->
+        <aside class="hidden md:flex flex-col w-96 bg-white border-l border-gray-200 shadow-2xl z-20">
+            <div class="p-6 border-b border-gray-100 bg-white">
+                <h2 class="text-xl font-bold text-gray-800">My Order</h2>
             </div>
 
-            <div class="cart-items" id="cart-items">
-                <!-- Cart items will be injected here -->
+            <div class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50" id="desktop-cart-container">
+                <!-- Injected Items -->
             </div>
 
-            <div class="cart-footer">
-                <div class="total-row">
-                    <span>Total</span>
-                    <span id="cart-total">$0.00</span>
+            <div class="p-6 bg-white border-t border-gray-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+                <div class="flex justify-between items-end mb-4">
+                    <span class="text-gray-500 text-sm font-medium">Total</span>
+                    <span class="text-3xl font-extrabold text-gray-900 leading-none" id="desktop-total">$0.00</span>
                 </div>
-                <button class="checkout-btn" id="checkout-btn" disabled onclick="checkout()">
-                    Checkout
+                <button id="desktop-checkout-btn" disabled
+                    class="w-full py-4 bg-primary hover:bg-primary-dark disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold text-lg rounded-xl shadow-lg transform active:scale-[0.98] transition-all"
+                    onclick="checkout()">
+                    Sign & Pay
                 </button>
             </div>
         </aside>
+
     </div>
 
-    <!-- Customization Modal -->
-    <div class="modal-overlay" id="modal-overlay">
-        <div class="modal">
-            <div class="modal-header">
-                <div class="modal-title" id="modal-title">Customize Pizza</div>
-                <button class="modal-close" onclick="closeModal()">×</button>
+    <!-- Mobile Bottom Cart Bar -->
+    <div class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] z-30 p-4 transition-transform duration-300"
+        id="mobile-cart-bar">
+        <button onclick="openMobileCart()"
+            class="w-full flex items-center justify-between bg-primary text-white p-4 rounded-xl shadow-lg active:scale-[0.98] transition-all">
+            <div class="flex items-center space-x-3">
+                <span class="bg-white/20 px-2 py-1 rounded text-sm font-bold" id="mobile-cart-count">0</span>
+                <span class="font-semibold text-lg">View Order</span>
             </div>
-            <div class="modal-body" id="modal-body">
-                <!-- Dynamic Content -->
+            <span class="text-xl font-bold" id="mobile-cart-total">$0.00</span>
+        </button>
+    </div>
+
+    <!-- Mobile Cart Modal (Full Screen Sheet) -->
+    <div id="mobile-cart-modal" class="fixed inset-0 z-50 hidden">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onclick="closeMobileCart()"></div>
+
+        <!-- Sheet -->
+        <div class="absolute bottom-0 left-0 right-0 h-[85vh] bg-white rounded-t-2xl shadow-2xl flex flex-col transform transition-transform duration-300 translate-y-full"
+            id="mobile-cart-sheet">
+
+            <!-- Handle -->
+            <div class="w-full flex justify-center pt-3 pb-1" onclick="closeMobileCart()">
+                <div class="w-12 h-1.5 bg-gray-300 rounded-full"></div>
             </div>
-            <div class="modal-footer">
-                <div class="modal-price" id="modal-total">$0.00</div>
-                <button class="add-btn" onclick="confirmCustomization()">Add to Order</button>
+
+            <div class="p-4 border-b border-gray-100 flex justify-between items-center">
+                <h2 class="text-xl font-bold bg-white">Order Summary</h2>
+                <button onclick="closeMobileCart()"
+                    class="p-2 bg-gray-100 rounded-full text-gray-500 hover:bg-gray-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50" id="mobile-cart-container">
+                <!-- Injected Items -->
+            </div>
+
+            <div class="p-4 bg-white border-t border-gray-200">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-gray-500 font-medium">Total</span>
+                    <span class="text-3xl font-extrabold text-primary" id="mobile-modal-total">$0.00</span>
+                </div>
+                <button id="mobile-checkout-btn" disabled
+                    class="w-full py-4 bg-primary hover:bg-primary-dark disabled:bg-gray-300 text-white font-bold text-lg rounded-xl shadow-lg active:scale-[0.98] transition-all"
+                    onclick="checkout()">
+                    Sign & Pay
+                </button>
             </div>
         </div>
     </div>
 
+    <!-- Builder Modal (Full Screen) -->
+    <div id="builder-modal" class="fixed inset-0 z-50 hidden justify-center items-end sm:items-center">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity" onclick="closeBuilder()"></div>
+
+        <!-- Content -->
+        <div
+            class="relative w-full sm:w-[90%] max-w-2xl h-[90vh] sm:h-[80vh] bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-slide-up">
+
+            <!-- Header -->
+            <div class="p-4 sm:p-6 border-b border-gray-100 flex justify-between items-center bg-white z-10">
+                <h2 class="text-xl sm:text-2xl font-bold text-gray-900" id="builder-title">Product Name</h2>
+                <button onclick="closeBuilder()"
+                    class="p-2 bg-gray-50 rounded-full text-gray-500 border border-gray-200 hover:bg-gray-100 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Scrollable Body -->
+            <div class="flex-1 overflow-y-auto p-4 sm:p-6 bg-gray-50 space-y-6" id="builder-body">
+                <!-- Config Sections Injected Here -->
+            </div>
+
+            <!-- Footer -->
+            <div class="p-4 sm:p-6 bg-white border-t border-gray-200 z-10 box-shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+                <div class="flex justify-between items-center">
+                    <div class="flex flex-col">
+                        <span class="text-xs text-gray-500 uppercase tracking-wide font-semibold">Item Total</span>
+                        <span class="text-2xl sm:text-3xl font-extrabold text-primary leading-none"
+                            id="builder-price">$0.00</span>
+                    </div>
+                    <button onclick="confirmBuilder()"
+                        class="px-8 py-3 sm:py-4 bg-primary hover:bg-primary-dark text-white font-bold text-lg rounded-xl shadow-lg active:scale-[0.98] transition-all">
+                        Add to Order
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
     <script>
-        // --- Data Models ---
+        /* --- DATA --- */
+        const Categories = [
+            { id: 'pizzas', name: 'Pizzas', icon: '🍕' },
+            { id: 'sides', name: 'Sides', icon: '🍟' },
+            { id: 'drinks', name: 'Drinks', icon: '🥤' }
+        ];
 
         const Sizes = {
-            SMALL: { id: 's', name: 'Small (10")', priceMult: 0.8 },
-            MEDIUM: { id: 'm', name: 'Medium (12")', priceMult: 1.0 }, // Base Price
-            LARGE: { id: 'l', name: 'Large (14")', priceMult: 1.2 },
-            XLARGE: { id: 'xl', name: 'X-Large (16")', priceMult: 1.5 }
+            SMALL: { id: 's', name: 'Small', priceMult: 0.8 },
+            MEDIUM: { id: 'm', name: 'Medium', priceMult: 1.0 },
+            LARGE: { id: 'l', name: 'Large', priceMult: 1.2 },
+            XLARGE: { id: 'xl', name: 'X-Large', priceMult: 1.5 }
         };
 
         const Crusts = {
             THIN: { id: 'thin', name: 'Thin Crust', price: 0 },
-            REGULAR: { id: 'reg', name: 'Regular Hand Tossed', price: 0 },
-            STUFFED: { id: 'stuffed', name: 'Stuffed Crust', price: 2.50 },
+            REGULAR: { id: 'reg', name: 'Original', price: 0 },
+            STUFFED: { id: 'stuffed', name: 'Stuffed', price: 2.50 },
             GF: { id: 'gf', name: 'Gluten Free', price: 3.00 }
         };
 
@@ -551,412 +230,328 @@
             { id: 't6', name: 'Bacon', price: 1.75 },
             { id: 't7', name: 'Black Olives', price: 1.00 },
             { id: 't8', name: 'Green Peppers', price: 1.00 },
-            { id: 't9', name: 'Jalapeños', price: 1.00 },
-            { id: 't10', name: 'Pineapple', price: 1.00 },
-            { id: 't11', name: 'Spinach', price: 1.00 },
-            { id: 't12', name: 'Fresh Basil', price: 0.50 }
+            { id: 't9', name: 'Pineapple', price: 1.00 },
+            { id: 't10', name: 'Jalapeños', price: 1.00 }
         ];
 
         const Modifiers = [
             { id: 'm1', name: 'Well Done' },
             { id: 'm2', name: 'Light Sauce' },
             { id: 'm3', name: 'Extra Sauce' },
-            { id: 'm4', name: 'Uncut' }
+            { id: 'm4', name: 'Double Cut' }
         ];
 
-        const Menu = [
-            {
-                category: "Pizzas 🍕",
-                type: "pizza", // Triggers customization
-                items: [
-                    { id: 101, name: "Margherita", basePrice: 12.00, emoji: "🧀", desc: "Tomato, mozzarella, basil" },
-                    { id: 102, name: "Pepperoni", basePrice: 14.50, emoji: "🍕", desc: "Double pepperoni, mozzarella" },
-                    { id: 103, name: "Vegetarian", basePrice: 13.50, emoji: "🥦", desc: "Peppers, onions, mushrooms, olives" },
-                    { id: 104, name: "Hawaiian", basePrice: 14.00, emoji: "🍍", desc: "Ham and pineapple" },
-                    { id: 105, name: "BBQ Chicken", basePrice: 15.50, emoji: "🍗", desc: "BBQ sauce, chicken, red onion" },
-                    { id: 106, name: "Spicy Meat", basePrice: 16.00, emoji: "🌶️", desc: "Chili, pepperoni, sausage, beef" }
-                ]
-            },
-            {
-                category: "Sides & Drinks 🍟",
-                type: "simple", // Direct add
-                items: [
-                    { id: 201, name: "Garlic Bread", price: 5.50, emoji: "🥖", desc: "Toasted with garlic butter" },
-                    { id: 202, name: "Mozzarella Sticks", price: 6.50, emoji: "🧀", desc: "6 pcs with marinara dip" },
-                    { id: 203, name: "Cola", price: 2.50, emoji: "🥤", desc: "330ml can" },
-                    { id: 204, name: "Lemonade", price: 3.00, emoji: "🍋", desc: "Freshly squeezed" },
-                    { id: 205, name: "Beer", price: 5.00, emoji: "🍺", desc: "Local craft lager" }
-                ]
-            }
+        const MenuItems = [
+            { id: 101, category: 'pizzas', name: "Margherita", basePrice: 12.00, emoji: "🧀", desc: "Classic tomato sauce, mozzarella cheese" },
+            { id: 102, category: 'pizzas', name: "Pepperoni", basePrice: 14.50, emoji: "🍕", desc: "Double pepperoni, tomato sauce, mozzarella" },
+            { id: 103, category: 'pizzas', name: "Vegetarian", basePrice: 13.50, emoji: "🥦", desc: "Green peppers, onions, mushrooms, black olives" },
+            { id: 104, category: 'pizzas', name: "Hawaiian", basePrice: 14.00, emoji: "🍍", desc: "Ham, pineapple, mozzarella" },
+            { id: 105, category: 'pizzas', name: "BBQ Chicken", basePrice: 15.50, emoji: "🍗", desc: "BBQ sauce base, grilled chicken, red onion" },
+            { id: 106, category: 'pizzas', name: "Meat Lovers", basePrice: 16.00, emoji: "🥓", desc: "Pepperoni, sausage, bacon, beef" },
+            { id: 201, category: 'sides', name: "Garlic Knots", price: 5.50, emoji: "🥖", desc: "Oven baked dough tied in knots w/ garlic butter" },
+            { id: 202, category: 'sides', name: "Cheesy Bread", price: 6.50, emoji: "🧀", desc: "Toasted french bread topped with mozzarella" },
+            { id: 203, category: 'sides', name: "Wings (6)", price: 8.00, emoji: "🍗", desc: "Buffalo or BBQ wings with ranch" },
+            { id: 301, category: 'drinks', name: "Cola", price: 2.50, emoji: "🥤", desc: "20oz Fountain Drink" },
+            { id: 302, category: 'drinks', name: "Lemonade", price: 2.50, emoji: "🍋", desc: "Fresh squeezed" },
+            { id: 303, category: 'drinks', name: "Iced Tea", price: 2.50, emoji: "🧊", desc: "Sweet or Unsweet" }
         ];
 
-        // --- State ---
+        /* --- STATE --- */
         let cart = [];
-        let currentCustomizingItem = null;
-        let currentSelection = {
-            size: Sizes.MEDIUM,
-            crust: Crusts.REGULAR,
-            toppings: [], // Set of IDs
-            modifiers: [] // Set of IDs
-        };
+        let currentCategory = 'pizzas';
+        let builderItem = null;
+        let builderState = { size: Sizes.MEDIUM, crust: Crusts.REGULAR, toppings: [], modifiers: [] };
 
-        // --- Init ---
+        /* --- INIT --- */
         function init() {
+            renderNav();
             renderMenu();
-            updateCart();
+            renderCart();
         }
 
-        // --- Rendering ---
+        /* --- NAVIGATION --- */
+        function renderNav() {
+            // Desktop
+            const dNav = document.getElementById('desktop-nav');
+            dNav.innerHTML = Categories.map(cat => `
+                <button onclick="setCategory('${cat.id}')" class="w-full text-left px-6 py-4 flex items-center space-x-3 transition-colors ${cat.id === currentCategory ? 'bg-white/10 text-white border-l-4 border-primary' : 'text-gray-400 hover:bg-white/5 hover:text-white border-l-4 border-transparent'}">
+                    <span class="text-2xl">${cat.icon}</span>
+                    <span class="font-semibold text-lg">${cat.name}</span>
+                </button>
+            `).join('');
+
+            // Mobile (Tabs)
+            const mNav = document.getElementById('mobile-nav');
+            mNav.innerHTML = Categories.map(cat => `
+                <button onclick="setCategory('${cat.id}')" class="inline-flex items-center space-x-2 px-6 py-4 border-b-2 transition-colors ${cat.id === currentCategory ? 'border-primary text-white bg-white/5' : 'border-transparent text-gray-400'}">
+                    <span class="text-xl">${cat.icon}</span>
+                    <span class="font-semibold">${cat.name}</span>
+                </button>
+            `).join('');
+        }
+
+        function setCategory(id) {
+            currentCategory = id;
+            renderNav();
+            renderMenu();
+            // Scroll to top
+            document.getElementById('main-scroll-area').scrollTop = 0;
+        }
+
+        /* --- MENU --- */
         function renderMenu() {
-            const container = document.getElementById('menu-container');
-            let html = '';
+            const cat = Categories.find(c => c.id === currentCategory);
+            document.getElementById('category-title').innerText = cat.name;
 
-            Menu.forEach(cat => {
-                html += `<h2 class="category-title">${cat.category}</h2>`;
-                html += `<div class="menu-grid">`;
+            const grid = document.getElementById('menu-grid');
+            const items = MenuItems.filter(i => i.category === currentCategory);
 
-                cat.items.forEach(item => {
-                    // Determine click action based on type
-                    const clickAction = cat.type === 'pizza'
-                        ? `openModal(${item.id})`
-                        : `addToCartSimple(${item.id})`;
+            grid.innerHTML = items.map(item => {
+                const isComplex = !!item.basePrice;
+                const price = isComplex ? item.basePrice : item.price;
+                const priceLabel = isComplex ? `Starts at $${price.toFixed(2)}` : `$${price.toFixed(2)}`;
+                const action = isComplex ? `openBuilder(${item.id})` : `addSimpleItem(${item.id})`;
 
-                    const priceDisplay = item.basePrice
-                        ? `from $${item.basePrice.toFixed(2)}`
-                        : `$${item.price.toFixed(2)}`;
-
-                    html += `
-                    <div class="menu-item" onclick="${clickAction}">
-                        <span class="item-emoji">${item.emoji}</span>
-                        <div class="item-details">
-                            <h3>${item.name}</h3>
-                            <p>${item.desc}</p>
-                            <div class="item-price">${priceDisplay}</div>
+                return `
+                    <div onclick="${action}" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col h-60 md:h-72 cursor-pointer transform transition-all duration-200 hover:-translate-y-1 hover:shadow-md active:scale-95 select-none">
+                        <div class="h-1/2 bg-gray-50 flex items-center justify-center text-6xl border-b border-gray-50">
+                            ${item.emoji}
+                        </div>
+                        <div class="p-4 flex flex-col flex-1 justify-between">
+                            <div>
+                                <h3 class="font-bold text-gray-900 leading-tight mb-1">${item.name}</h3>
+                                <p class="text-xs text-gray-500 line-clamp-2 leading-relaxed">${item.desc}</p>
+                            </div>
+                            <span class="font-extrabold text-primary text-lg self-end">${priceLabel}</span>
                         </div>
                     </div>
                 `;
-                });
+            }).join('');
+        }
 
-                html += `</div>`;
-            });
+        /* --- BUILDER --- */
+        function openBuilder(id) {
+            const item = MenuItems.find(i => i.id === id);
+            if (!item) return;
+
+            builderItem = item;
+            builderState = { size: Sizes.MEDIUM, crust: Crusts.REGULAR, toppings: [], modifiers: [] };
+
+            document.getElementById('builder-title').innerText = item.name;
+            renderBuilderBody();
+            updateBuilderTotal();
+
+            const modal = document.getElementById('builder-modal');
+            modal.style.display = 'flex';
+        }
+
+        function closeBuilder() {
+            document.getElementById('builder-modal').style.display = 'none';
+        }
+
+        function renderBuilderBody() {
+            const container = document.getElementById('builder-body');
+            let html = '';
+
+            // Helper for section container
+            const section = (title, content) => `
+                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                    <h3 class="font-bold text-gray-800 mb-4 flex items-center"><div class="w-1.5 h-6 bg-primary rounded mr-3"></div>${title}</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        ${content}
+                    </div>
+                </div>
+            `;
+
+            // Helper for option card
+            const option = (label, price, selected, onClick) => `
+                <div onclick="${onClick}" class="relative p-4 rounded-lg border-2 cursor-pointer transition-all ${selected ? 'border-primary bg-red-50 text-primary' : 'border-gray-100 bg-white hover:border-gray-200 text-gray-700'}">
+                    <div class="font-semibold text-sm mb-1">${label}</div>
+                    ${price ? `<div class="text-xs ${selected ? 'text-red-500' : 'text-gray-400'}">${price}</div>` : ''}
+                    ${selected ? '<div class="absolute top-2 right-2 text-primary font-bold">✓</div>' : ''}
+                </div>
+            `;
+
+            // 1. Size
+            html += section("Size", Object.values(Sizes).map(s => {
+                const p = s.priceMult === 1 ? '' : (s.priceMult > 1 ? '+$' : '-$');
+                return option(s.name, `${s.priceMult}x Price`, builderState.size.id === s.id, `setBuilderOption('size', '${s.id}')`);
+            }).join(''));
+
+            // 2. Crust
+            html += section("Crust", Object.values(Crusts).map(c => {
+                const p = c.price === 0 ? '' : `+$${c.price.toFixed(2)}`;
+                return option(c.name, p, builderState.crust.id === c.id, `setBuilderOption('crust', '${c.id}')`);
+            }).join(''));
+
+            // 3. Toppings
+            html += section("Toppings", Toppings.map(t => {
+                return option(t.name, `+$${t.price.toFixed(2)}`, builderState.toppings.includes(t.id), `toggleBuilderList('toppings', '${t.id}')`);
+            }).join(''));
+
+            // 4. Modifiers
+            html += section("Special Instructions", Modifiers.map(m => {
+                return option(m.name, null, builderState.modifiers.includes(m.id), `toggleBuilderList('modifiers', '${m.id}')`);
+            }).join(''));
 
             container.innerHTML = html;
         }
 
-        // --- Modal Logic ---
-        function openModal(itemId) {
-            // Find item
-            let item = null;
-            for (const cat of Menu) {
-                item = cat.items.find(i => i.id === itemId);
-                if (item) break;
-            }
+        function setBuilderOption(type, id) {
+            if (type === 'size') builderState.size = Object.values(Sizes).find(s => s.id === id);
+            if (type === 'crust') builderState.crust = Object.values(Crusts).find(c => c.id === id);
+            renderBuilderBody();
+            updateBuilderTotal();
+        }
+
+        function toggleBuilderList(type, id) {
+            const list = builderState[type];
+            const idx = list.indexOf(id);
+            if (idx > -1) list.splice(idx, 1);
+            else list.push(id);
+            renderBuilderBody();
+            updateBuilderTotal();
+        }
+
+        function calculateTotal(item, state) {
+            let t = item.basePrice * state.size.priceMult + state.crust.price;
+            state.toppings.forEach(id => {
+                const top = Toppings.find(x => x.id === id);
+                if (top) t += top.price;
+            });
+            return t;
+        }
+
+        function updateBuilderTotal() {
+            const total = calculateTotal(builderItem, builderState);
+            document.getElementById('builder-price').innerText = `$${total.toFixed(2)}`;
+        }
+
+        function confirmBuilder() {
+            const total = calculateTotal(builderItem, builderState);
+            cart.push({
+                uniqueId: Date.now(),
+                id: builderItem.id,
+                name: builderItem.name,
+                price: total,
+                quantity: 1,
+                details: JSON.parse(JSON.stringify(builderState))
+            });
+            closeBuilder();
+            renderCart();
+        }
+
+        /* --- CART --- */
+        function addSimpleItem(id) {
+            const item = MenuItems.find(i => i.id === id);
+            const existing = cart.find(c => c.id === id && !c.details);
+            if (existing) existing.quantity++;
+            else cart.push({ uniqueId: Date.now(), id: item.id, name: item.name, price: item.price, quantity: 1, details: null });
+            renderCart();
+        }
+
+        function updateQty(uid, delta) {
+            const item = cart.find(c => c.uniqueId === uid);
             if (!item) return;
-
-            currentCustomizingItem = item;
-            // Reset Defaults
-            currentSelection = {
-                size: Sizes.MEDIUM,
-                crust: Crusts.REGULAR,
-                toppings: [],
-                modifiers: []
-            };
-
-            // Render Modal Content
-            document.getElementById('modal-title').innerText = item.name;
-            renderModalBody();
-            updateModalTotal();
-
-            // Show Modal
-            document.getElementById('modal-overlay').classList.add('active');
+            item.quantity += delta;
+            if (item.quantity < 1) cart = cart.filter(c => c.uniqueId !== uid);
+            renderCart();
         }
 
-        function closeModal() {
-            document.getElementById('modal-overlay').classList.remove('active');
-            currentCustomizingItem = null;
+        function remove(uid) {
+            cart = cart.filter(c => c.uniqueId !== uid);
+            renderCart();
         }
 
-        function renderModalBody() {
-            const body = document.getElementById('modal-body');
+        function renderCart() {
+            const total = cart.reduce((acc, i) => acc + (i.price * i.quantity), 0);
+            const count = cart.reduce((acc, i) => acc + i.quantity, 0);
+            const totalStr = `$${total.toFixed(2)}`;
 
-            // 1. Sizes
-            let html = `<div class="option-group">
-            <div class="option-title">Size</div>
-            <div class="radio-grid">`;
+            // Desktop Render
+            const dContainer = document.getElementById('desktop-cart-container');
+            const dBtn = document.getElementById('desktop-checkout-btn');
 
-            Object.values(Sizes).forEach(size => {
-                const isSelected = currentSelection.size.id === size.id ? 'selected' : '';
-                const priceText = size.priceMult === 1 ? 'Standard' : `${size.priceMult}x Price`;
+            // Mobile State
+            document.getElementById('mobile-cart-total').innerText = totalStr;
+            document.getElementById('mobile-cart-count').innerText = count;
+            document.getElementById('mobile-modal-total').innerText = totalStr;
+            const mBtn = document.getElementById('mobile-checkout-btn');
 
-                html += `
-                <div class="option-card ${isSelected}" onclick="selectSize('${size.id}')">
-                    <span class="option-name">${size.name}</span>
-                    <span class="option-price">${priceText}</span>
-                </div>`;
-            });
-            html += `</div></div>`;
+            dBtn.disabled = cart.length === 0;
+            mBtn.disabled = cart.length === 0;
+            document.getElementById('desktop-total').innerText = totalStr;
 
-            // 2. Crusts
-            html += `<div class="option-group">
-            <div class="option-title">Crust</div>
-            <div class="radio-grid">`;
-
-            Object.values(Crusts).forEach(crust => {
-                const isSelected = currentSelection.crust.id === crust.id ? 'selected' : '';
-                const priceText = crust.price === 0 ? 'Free' : `+$${crust.price.toFixed(2)}`;
-
-                html += `
-                <div class="option-card ${isSelected}" onclick="selectCrust('${crust.id}')">
-                    <span class="option-name">${crust.name}</span>
-                    <span class="option-price">${priceText}</span>
-                </div>`;
-            });
-            html += `</div></div>`;
-
-            // 3. Toppings
-            html += `<div class="option-group">
-            <div class="option-title">Extra Toppings</div>
-            <div class="checkbox-grid">`;
-
-            Toppings.forEach(t => {
-                const isSelected = currentSelection.toppings.includes(t.id) ? 'selected' : '';
-
-                html += `
-                <div class="option-card ${isSelected}" onclick="toggleTopping('${t.id}')">
-                    <span class="option-name">${t.name}</span>
-                    <span class="option-price">+$${t.price.toFixed(2)}</span>
-                </div>`;
-            });
-            html += `</div></div>`;
-
-            // 4. Modifiers
-            html += `<div class="option-group">
-            <div class="option-title">Special Requests</div>
-             <div class="checkbox-grid">`;
-
-            Modifiers.forEach(m => {
-                const isSelected = currentSelection.modifiers.includes(m.id) ? 'selected' : '';
-                html += `
-                <div class="option-card ${isSelected}" onclick="toggleModifier('${m.id}')">
-                    <span class="option-name">${m.name}</span>
-                </div>`;
-            });
-            html += `</div></div>`;
-
-            body.innerHTML = html;
-        }
-
-        // --- Selection Handlers ---
-        function selectSize(sizeId) {
-            currentSelection.size = Object.values(Sizes).find(s => s.id === sizeId);
-            renderModalBody(); // Re-render to show selection state
-            updateModalTotal();
-        }
-
-        function selectCrust(crustId) {
-            currentSelection.crust = Object.values(Crusts).find(c => c.id === crustId);
-            renderModalBody();
-            updateModalTotal();
-        }
-
-        function toggleTopping(tId) {
-            const index = currentSelection.toppings.indexOf(tId);
-            if (index > -1) {
-                currentSelection.toppings.splice(index, 1);
-            } else {
-                currentSelection.toppings.push(tId);
-            }
-            renderModalBody();
-            updateModalTotal();
-        }
-
-        function toggleModifier(mId) {
-            const index = currentSelection.modifiers.indexOf(mId);
-            if (index > -1) {
-                currentSelection.modifiers.splice(index, 1);
-            } else {
-                currentSelection.modifiers.push(mId);
-            }
-            renderModalBody();
-        }
-
-        function calculateItemTotal(item, selection) {
-            if (!item.basePrice) return item.price; // Simple item
-
-            // Pizza Logic
-            let total = item.basePrice;
-
-            // Size Multiplier applies to base price
-            total *= selection.size.priceMult;
-
-            // Add Crust price
-            total += selection.crust.price;
-
-            // Add Toppings
-            selection.toppings.forEach(tId => {
-                const t = Toppings.find(t => t.id === tId);
-                if (t) total += t.price;
-            });
-
-            return total;
-        }
-
-        function updateModalTotal() {
-            const total = calculateItemTotal(currentCustomizingItem, currentSelection);
-            document.getElementById('modal-total').innerText = `$${total.toFixed(2)}`;
-        }
-
-        function confirmCustomization() {
-            const newItem = {
-                uniqueId: Date.now(), // Unique ID because same pizza can have diff toppings
-                id: currentCustomizingItem.id,
-                name: currentCustomizingItem.name,
-                basePrice: currentCustomizingItem.basePrice,
-                selection: JSON.parse(JSON.stringify(currentSelection)), // Deep copy
-                price: calculateItemTotal(currentCustomizingItem, currentSelection),
-                quantity: 1
-            };
-
-            cart.push(newItem);
-            closeModal();
-            updateCart();
-        }
-
-        // --- Simple Item Handler ---
-        function addToCartSimple(itemId) {
-            let itemInfo = null;
-            for (const cat of Menu) {
-                const found = cat.items.find(i => i.id === itemId);
-                if (found) {
-                    itemInfo = found;
-                    break;
+            // Generate HTML for Items
+            const html = cart.length ? cart.map(item => {
+                let desc = '';
+                if (item.details) {
+                    const { size, crust, toppings, modifiers } = item.details;
+                    desc = `${size.name}, ${crust.name}`;
+                    if (toppings.length) desc += ` + ${toppings.map(id => Toppings.find(t => t.id === id).name).join(', ')}`;
+                    if (modifiers.length) desc += ` (${modifiers.map(id => Modifiers.find(m => m.id === id).name).join(', ')})`;
+                } else {
+                    desc = MenuItems.find(i => i.id === item.id).desc;
                 }
-            }
 
-            if (!itemInfo) return;
-
-            // Check if existing identical simple item
-            const existing = cart.find(c => c.id === itemId && !c.selection);
-
-            if (existing) {
-                existing.quantity++;
-            } else {
-                cart.push({
-                    uniqueId: Date.now(),
-                    id: itemInfo.id,
-                    name: itemInfo.name,
-                    price: itemInfo.price,
-                    quantity: 1
-                });
-            }
-            updateCart();
-        }
-
-        // --- Cart Logic ---
-        function updateQuantity(uniqueId, change) {
-            const index = cart.findIndex(c => c.uniqueId === uniqueId);
-            if (index === -1) return;
-
-            const item = cart[index];
-            const newQty = item.quantity + change;
-
-            if (newQty <= 0) {
-                cart.splice(index, 1);
-            } else {
-                item.quantity = newQty;
-            }
-
-            updateCart();
-        }
-
-        function updateCart() {
-            const cartContainer = document.getElementById('cart-items');
-            const countBadge = document.getElementById('cart-count');
-            const totalDisplay = document.getElementById('cart-total');
-            const checkoutBtn = document.getElementById('checkout-btn');
-
-            // Totals
-            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-            const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-
-            countBadge.textContent = `${totalItems} item${totalItems !== 1 ? 's' : ''}`;
-            totalDisplay.textContent = `$${totalPrice.toFixed(2)}`;
-            checkoutBtn.disabled = cart.length === 0;
-
-            // Render
-            if (cart.length === 0) {
-                cartContainer.innerHTML = `
-                <div class="empty-cart">
-                    <div class="empty-cart-icon">🛒</div>
+                return `
+                    <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col gap-3">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <h4 class="font-bold text-gray-800">${item.name}</h4>
+                                <p class="text-xs text-gray-500 mt-1 leading-relaxed">${desc}</p>
+                            </div>
+                            <span class="font-bold text-gray-900 ml-2">$${(item.price * item.quantity).toFixed(2)}</span>
+                        </div>
+                        <div class="flex justify-between items-end border-t border-gray-50 pt-3">
+                            <button onclick="remove(${item.uniqueId})" class="text-xs text-red-500 font-semibold hover:text-red-600 px-2 py-1 -ml-2 rounded hover:bg-red-50">Remove</button>
+                            <div class="flex items-center bg-gray-100 rounded-lg p-1">
+                                <button onclick="updateQty(${item.uniqueId}, -1)" class="w-8 h-8 flex items-center justify-center bg-white rounded shadow-sm text-gray-600 font-bold hover:bg-gray-50">-</button>
+                                <span class="w-8 text-center text-sm font-bold text-gray-700">${item.quantity}</span>
+                                <button onclick="updateQty(${item.uniqueId}, 1)" class="w-8 h-8 flex items-center justify-center bg-white rounded shadow-sm text-gray-600 font-bold hover:bg-gray-50">+</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('') : `
+                <div class="flex flex-col items-center justify-center h-64 text-gray-400">
+                    <span class="text-4xl mb-4">🛒</span>
                     <p>Your cart is empty</p>
-                    <p style="font-size: 0.85rem; margin-top: 0.5rem; color: var(--text-muted)">Add delicious items from the menu to get started!</p>
                 </div>
             `;
-                return;
-            }
 
-            let html = '';
-            cart.forEach(item => {
-                const total = item.price * item.quantity;
+            dContainer.innerHTML = html;
+            document.getElementById('mobile-cart-container').innerHTML = html;
+        }
 
-                // Build details string
-                let details = '';
-                if (item.selection) {
-                    const parts = [];
-                    parts.push(item.selection.size.name);
-                    parts.push(item.selection.crust.name);
+        /* --- MOBILE CART MODAL --- */
+        function openMobileCart() {
+            const modal = document.getElementById('mobile-cart-modal');
+            const sheet = document.getElementById('mobile-cart-sheet');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                sheet.classList.remove('translate-y-full');
+            }, 10);
+        }
 
-                    // Toppings names
-                    if (item.selection.toppings.length > 0) {
-                        const tNames = item.selection.toppings.map(id => Toppings.find(t => t.id === id).name);
-                        parts.push(`+ ${tNames.join(', ')}`);
-                    }
-
-                    // Modifiers
-                    if (item.selection.modifiers.length > 0) {
-                        const mNames = item.selection.modifiers.map(id => Modifiers.find(m => m.id === id).name);
-                        parts.push(`(${mNames.join(', ')})`);
-                    }
-
-                    details = parts.join(', ');
-                } else if (item.desc) {
-                    details = item.desc; // Fallback for simple props if we kept it
-                }
-
-                html += `
-                <div class="cart-item">
-                    <div class="cart-item-info">
-                        <div class="cart-item-title">${item.name}</div>
-                        <div class="cart-item-details">${details}</div>
-                        <div class="cart-item-price">$${item.price.toFixed(2)}</div>
-                    </div>
-                    <div class="cart-item-controls">
-                        <button class="qty-btn remove-btn" onclick="updateQuantity(${item.uniqueId}, -1)">−</button>
-                        <span style="font-weight: 600; min-width: 20px; text-align: center;">${item.quantity}</span>
-                        <button class="qty-btn" onclick="updateQuantity(${item.uniqueId}, 1)">+</button>
-                    </div>
-                </div>
-            `;
-            });
-
-            cartContainer.innerHTML = html;
-            // Auto scroll
-            cartContainer.scrollTop = cartContainer.scrollHeight;
+        function closeMobileCart() {
+            const modal = document.getElementById('mobile-cart-modal');
+            const sheet = document.getElementById('mobile-cart-sheet');
+            sheet.classList.add('translate-y-full');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
         }
 
         function checkout() {
-            if (cart.length === 0) return;
-            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            if (confirm(`Confirm order for $${total.toFixed(2)}?`)) {
-                alert('🎉 Order Placed!');
-                cart = [];
-                updateCart();
-            }
+            alert('Processing Payment...');
+            cart = [];
+            renderCart();
+            closeMobileCart();
+            closeBuilder();
         }
 
-        // Start App
         init();
-
     </script>
 </body>
 
