@@ -182,7 +182,7 @@
             </div>
 
             <!-- Footer -->
-            <div class="p-4 sm:p-6 bg-white border-t border-gray-200 z-10 box-shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+            <div class="p-4 sm:p-6 bg-white border-t border-gray-200 z-10 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
                 <div class="flex justify-between items-center">
                     <div class="flex flex-col">
                         <span class="text-xs text-gray-500 uppercase tracking-wide font-semibold">Item Total</span>
@@ -458,7 +458,7 @@
             renderCart();
         }
 
-        function remove(uid) {
+        function removeItem(uid) {
             cart = cart.filter(c => c.uniqueId !== uid);
             renderCart();
         }
@@ -504,7 +504,7 @@
                             <span class="font-bold text-gray-900 ml-2">$${(item.price * item.quantity).toFixed(2)}</span>
                         </div>
                         <div class="flex justify-between items-end border-t border-gray-50 pt-3">
-                            <button onclick="remove(${item.uniqueId})" class="text-xs text-red-500 font-semibold hover:text-red-600 px-2 py-1 -ml-2 rounded hover:bg-red-50">Remove</button>
+                            <button onclick="removeItem(${item.uniqueId})" class="text-xs text-red-500 font-semibold hover:text-red-600 px-2 py-1 -ml-2 rounded hover:bg-red-50">Remove</button>
                             <div class="flex items-center bg-gray-100 rounded-lg p-1">
                                 <button onclick="updateQty(${item.uniqueId}, -1)" class="w-8 h-8 flex items-center justify-center bg-white rounded shadow-sm text-gray-600 font-bold hover:bg-gray-50">-</button>
                                 <span class="w-8 text-center text-sm font-bold text-gray-700">${item.quantity}</span>
